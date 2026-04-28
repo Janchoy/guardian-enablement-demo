@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FPRS AI Enablement Hub</title>
+<style>
+:root{--navy:#1B3A5C;--navy-light:#2A5280;--gold:#C9A84C;--gold-light:#E8C97A;--cream:#FAF8F4;--cream-dark:#F0EDE6;--text:#1A1A2E;--text-muted:#6B7280;--border:rgba(27,58,92,0.12);--shadow:0 4px 24px rgba(27,58,92,0.10);--serif:Georgia,'Times New Roman',serif;--sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--sans);background:var(--cream);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6;}
+header{background:var(--navy);padding:0 48px;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.18);}
+.logo-group{display:flex;align-items:center;gap:14px;}
+.logo-icon{width:36px;height:36px;background:var(--gold);border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:var(--serif);font-weight:700;font-size:18px;color:var(--navy);}
+.logo-text{font-family:var(--serif);font-size:20px;font-weight:400;color:#fff;letter-spacing:.02em;}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.12em;text-transform:uppercase;margin-top:1px;}
+.tab-bar{background:#fff;border-bottom:1px solid var(--border);padding:0 48px;display:flex;}
+.tab{padding:16px 24px;font-size:13px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;gap:8px;user-select:none;}
+.tab:hover{color:var(--navy);}
+.tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+.tab-count{background:var(--cream-dark);color:var(--text-muted);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500;}
+.tab.active .tab-count{background:var(--navy);color:#fff;}
+.main{padding:40px 48px;max-width:1280px;margin:0 auto;}
+.section{display:none;}
+.section.active{display:block;}
+.hero-strip{background:linear-gradient(135deg,var(--navy) 0%,var(--navy-light) 100%);border-radius:16px;padding:36px 48px;margin-bottom:40px;display:flex;align-items:center;justify-content:space-between;gap:32px;overflow:hidden;position:relative;}
+.hero-strip::before{content:'';position:absolute;right:-60px;top:-60px;width:280px;height:280px;border-radius:50%;background:rgba(201,168,76,.08);}
+.hero-strip::after{content:'';position:absolute;right:80px;bottom:-80px;width:200px;height:200px;border-radius:50%;background:rgba(201,168,76,.05);}
+.hero-text h2{font-family:var(--serif);font-size:30px;font-weight:400;color:#fff;margin-bottom:8px;line-height:1.2;}
+.hero-text p{color:rgba(255,255,255,.65);font-size:14px;max-width:520px;line-height:1.6;}
+.hero-stats{display:flex;gap:32px;flex-shrink:0;position:relative;z-index:1;}
+.stat{text-align:center;}
+.stat-num{font-family:var(--serif);font-size:36px;font-weight:700;color:var(--gold);line-height:1;}
+.stat-label{font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-top:4px;}
+.filter-bar{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap;align-items:center;}
+.filter-label{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:500;margin-right:4px;}
+.filter-chip{padding:7px 16px;border-radius:20px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-muted);user-select:none;}
+.filter-chip:hover{border-color:var(--navy-light);color:var(--navy);}
+.filter-chip.active{background:var(--navy);border-color:var(--navy);color:#fff;}
+.search-box{margin-left:auto;position:relative;}
+.search-box input{padding:8px 16px 8px 36px;border:1.5px solid var(--border);border-radius:20px;font-family:var(--sans);font-size:13px;color:var(--text);background:#fff;outline:none;width:220px;transition:border-color .2s;}
+.search-box input:focus{border-color:var(--navy-light);}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:20px;}
+.prompt-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden;}
+.prompt-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);opacity:0;transition:opacity .2s;}
+.prompt-card:hover{box-shadow:var(--shadow);transform:translateY(-2px);border-color:rgba(27,58,92,.2);}
+.prompt-card:hover::before{opacity:1;}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;}
+.card-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.card-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:3px 9px;border-radius:10px;font-weight:500;}
+.tag-ops{background:#EFF6FF;color:#2563EB;}.tag-claims{background:#FFF7ED;color:#C2410C;}.tag-underwriting{background:#F0FDF4;color:#15803D;}.tag-advisor{background:#FDF4FF;color:#9333EA;}.tag-compliance{background:#FFF1F2;color:#BE123C;}.tag-productivity{background:#F0FDFA;color:#0F766E;}
+.card-title{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--navy);margin-bottom:8px;line-height:1.3;}
+.card-desc{font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:16px;}
+.prompt-box{background:var(--cream);border:1px solid var(--cream-dark);border-radius:8px;padding:14px 16px;font-size:12.5px;color:var(--text);line-height:1.6;margin-bottom:14px;}
+.prompt-var{background:rgba(201,168,76,.15);color:#92600A;padding:1px 6px;border-radius:4px;font-weight:500;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;}
+.complexity{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-muted);}
+.complexity-dots{display:flex;gap:3px;}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--cream-dark);}
+.dot.filled{background:var(--gold);}
+.copy-btn{background:var(--navy);color:#fff;border:none;padding:7px 16px;border-radius:8px;font-family:var(--sans);font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;}
+.copy-btn:hover{background:var(--navy-light);}
+.copy-btn.copied{background:#15803D;}
+.agents-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:24px;}
+.agent-card{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all .25s;}
+.agent-card:hover{box-shadow:var(--shadow);transform:translateY(-3px);}
+.agent-header{padding:24px 24px 20px;border-bottom:1px solid var(--cream-dark);display:flex;gap:16px;align-items:flex-start;}
+.agent-icon-wrap{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.agent-meta{flex:1;}
+.agent-name{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--navy);margin-bottom:4px;}
+.agent-type{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:500;}
+.agent-status{padding:4px 12px;border-radius:20px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;}
+.status-ready{background:#DCFCE7;color:#15803D;}.status-pilot{background:#FEF3C7;color:#B45309;}.status-planned{background:#F1F5F9;color:#64748B;}
+.agent-body{padding:20px 24px;}
+.agent-desc{font-size:13px;color:var(--text-muted);line-height:1.65;margin-bottom:18px;}
+.cap-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);font-weight:600;margin-bottom:8px;}
+.cap-list{display:flex;flex-direction:column;gap:5px;}
+.cap-item{display:flex;align-items:flex-start;gap:8px;font-size:12.5px;color:var(--text);line-height:1.5;}
+.cap-check{color:var(--gold);font-size:13px;flex-shrink:0;margin-top:1px;}
+.agent-metrics{display:flex;gap:16px;padding:14px 0;border-top:1px solid var(--cream-dark);border-bottom:1px solid var(--cream-dark);margin:18px 0 16px;}
+.metric{flex:1;text-align:center;}
+.metric-val{font-family:var(--serif);font-size:22px;font-weight:700;color:var(--navy);line-height:1;}
+.metric-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-top:3px;}
+.agent-footer{display:flex;gap:10px;}
+.btn-outline{flex:1;padding:9px;border:1.5px solid var(--border);border-radius:9px;background:transparent;font-family:var(--sans);font-size:12px;font-weight:500;color:var(--navy);cursor:pointer;transition:all .2s;}
+.btn-outline:hover{border-color:var(--navy);background:var(--cream);}
+.risk-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:8px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.risk-low{background:#DCFCE7;color:#15803D;}.risk-med{background:#FEF3C7;color:#B45309;}.risk-high{background:#FFF1F2;color:#BE123C;}
+.info-card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:28px 32px;}
+.info-card h3{font-family:var(--serif);font-size:22px;color:var(--navy);margin-bottom:6px;}
+.info-card .sub{font-size:13px;color:var(--text-muted);margin-bottom:24px;line-height:1.5;}
+.phase-list{display:flex;flex-direction:column;gap:16px;}
+.phase{display:flex;gap:16px;align-items:flex-start;}
+.phase-num{width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0;}
+.phase-content h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.phase-content p{font-size:12.5px;color:var(--text-muted);line-height:1.5;}
+.sidebar-card{background:var(--navy);border-radius:16px;padding:28px;color:#fff;}
+.sidebar-card h3{font-family:var(--serif);font-size:20px;font-weight:400;color:var(--gold-light);margin-bottom:4px;}
+.sidebar-card .sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:20px;line-height:1.5;}
+.metric-list{display:flex;flex-direction:column;gap:14px;}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,.08);}
+.metric-row:last-child{border-bottom:none;padding-bottom:0;}
+.metric-row-label{font-size:12px;color:rgba(255,255,255,.6);}
+.metric-row-val{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--gold);}
+.champion-grid{display:grid;grid-template-columns:2fr 1fr;gap:24px;}
+.gov-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.gov-table th{background:var(--navy);color:#fff;padding:10px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:500;}
+.gov-table th:first-child{border-radius:8px 0 0 0;}.gov-table th:last-child{border-radius:0 8px 0 0;}
+.gov-table td{padding:10px 14px;border-bottom:1px solid var(--cream-dark);color:var(--text);vertical-align:top;line-height:1.5;}
+.gov-table tr:last-child td{border-bottom:none;}
+.gov-table tr:nth-child(even) td{background:var(--cream);}
+.hitl-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:600;}
+.hitl-required{background:#FFF1F2;color:#BE123C;}.hitl-review{background:#FEF3C7;color:#B45309;}.hitl-auto{background:#DCFCE7;color:#15803D;}
+.arch-row{display:flex;align-items:stretch;overflow-x:auto;margin-bottom:20px;padding-bottom:4px;}
+.arch-node{flex:1;min-width:100px;background:var(--cream);border:1px solid var(--border);border-radius:10px;padding:14px 10px;text-align:center;position:relative;margin-right:28px;}
+.arch-node:last-child{margin-right:0;}
+.arch-node:not(:last-child)::after{content:'→';position:absolute;right:-20px;top:50%;transform:translateY(-50%);color:var(--gold);font-size:18px;font-weight:700;z-index:1;}
+.arch-node-icon{font-size:22px;margin-bottom:6px;}
+.arch-node-label{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);font-weight:600;margin-bottom:3px;}
+.arch-node-val{font-size:11px;color:var(--text);font-weight:500;line-height:1.4;}
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,40,.55);z-index:200;display:none;align-items:center;justify-content:center;padding:24px;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:#fff;border-radius:20px;max-width:720px;width:100%;max-height:88vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.22);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1);}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(10px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.modal-header{padding:28px 32px 20px;border-bottom:1px solid var(--cream-dark);display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;background:#fff;border-radius:20px 20px 0 0;z-index:10;}
+.modal-title{font-family:var(--serif);font-size:26px;font-weight:700;color:var(--navy);line-height:1.2;}
+.modal-close{background:var(--cream-dark);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s;}
+.modal-close:hover{background:#E5E7EB;}
+.modal-body{padding:24px 32px 32px;}
+.modal-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:24px;}
+.modal-tab{padding:10px 20px;font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;color:var(--text-muted);border-bottom:2px solid transparent;transition:all .2s;user-select:none;}
+.modal-tab.active{color:var(--navy);border-bottom-color:var(--gold);}
+.modal-tab-content{display:none;}
+.modal-tab-content.active{display:block;}
+.modal-section-label{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--text-muted);font-weight:600;margin-bottom:10px;margin-top:20px;}
+.modal-section-label:first-child{margin-top:0;}
+.full-prompt{background:var(--cream);border:1px solid var(--cream-dark);border-radius:10px;padding:18px 20px;font-size:13.5px;line-height:1.7;color:var(--text);white-space:pre-wrap;}
+.use-case-list{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.use-case-list li{display:flex;gap:10px;font-size:13px;color:var(--text-muted);line-height:1.5;}
+.use-case-list li::before{content:'→';color:var(--gold);font-weight:600;flex-shrink:0;}
+.tips-list{display:flex;flex-direction:column;gap:8px;}
+.tip-item{background:#FFFBEB;border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 8px 8px 0;font-size:12.5px;color:#78350F;line-height:1.5;}
+.modal-copy-btn{width:100%;margin-top:20px;padding:13px;background:var(--navy);color:#fff;border:none;border-radius:10px;font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:background .2s;}
+.modal-copy-btn:hover{background:var(--navy-light);}
+.prompt-card.hidden,.agent-card.hidden{display:none;}
+@media(max-width:768px){header{padding:0 20px;}.tab-bar{padding:0 20px;overflow-x:auto;}.main{padding:24px 20px;}.hero-strip{flex-direction:column;padding:24px;}.hero-stats{flex-wrap:wrap;justify-content:center;}.champion-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo-group">
+    <div class="logo-icon">G</div>
+    <div>
+      <div class="logo-text">FPRS AI Enablement Hub</div>
+      <div class="logo-sub">Financial Protection &amp; Retirement Solutions · Guardian Life</div>
+    </div>
+  </div>
+  <div style="font-family:var(--sans);font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.35);border:1px solid rgba(255,255,255,.18);padding:4px 12px;border-radius:4px;">Demo</div>
+</header>
+
+<div class="tab-bar">
+  <div class="tab" onclick="switchTab('champion',this)">Champion Program</div>
+  <div class="tab active" onclick="switchTab('prompts',this)">Prompt Library <span class="tab-count">14</span></div>
+  <div class="tab" onclick="switchTab('agents',this)">AI Agents <span class="tab-count">6</span></div>
+  <div class="tab" onclick="switchTab('governance',this)">Governance &amp; Risk</div>
+</div>
+
+<div class="main">
+
+<div id="prompts" class="section active">
+  <div class="hero-strip">
+    <div class="hero-text"><h2>Reusable Prompts for FPRS Teams</h2><p>Pre-built, governed prompt templates for everyday insurance workflows. Designed for non-technical users across operations, claims, underwriting, and advisor support.</p></div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">14</div><div class="stat-label">Prompts</div></div>
+      <div class="stat"><div class="stat-num">6</div><div class="stat-label">Use Areas</div></div>
+      <div class="stat"><div class="stat-num">~40%</div><div class="stat-label">Time Saved</div></div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <div class="filter-chip active" onclick="filterPrompts('all',this)">All</div>
+    <div class="filter-chip" onclick="filterPrompts('ops',this)">Operations</div>
+    <div class="filter-chip" onclick="filterPrompts('claims',this)">Claims</div>
+    <div class="filter-chip" onclick="filterPrompts('underwriting',this)">Underwriting</div>
+    <div class="filter-chip" onclick="filterPrompts('advisor',this)">Advisor Support</div>
+    <div class="filter-chip" onclick="filterPrompts('compliance',this)">Compliance</div>
+    <div class="filter-chip" onclick="filterPrompts('productivity',this)">Productivity</div>
+    <div class="search-box"><span class="search-icon">🔍</span><input type="text" id="promptSearch" placeholder="Search prompts…" oninput="searchPrompts(this.value)"></div>
+  </div>
+  <div class="cards-grid" id="promptGrid"></div>
+</div>
+
+<div id="agents" class="section">
+  <div class="hero-strip">
+    <div class="hero-text"><h2>AI Agents for FPRS Workflows</h2><p>Copilot Studio agents that automate repeatable tasks. Click "View Architecture" on any agent for data flow, trigger design, and governance controls.</p></div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">6</div><div class="stat-label">Agents</div></div>
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Pilot-Ready</div></div>
+      <div class="stat"><div class="stat-num">~60%</div><div class="stat-label">Effort Reduction</div></div>
+    </div>
+  </div>
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <div class="filter-chip active" onclick="filterAgents('all',this)">All</div>
+    <div class="filter-chip" onclick="filterAgents('ready',this)">● Pilot-Ready</div>
+    <div class="filter-chip" onclick="filterAgents('pilot',this)">◐ In Pilot</div>
+    <div class="filter-chip" onclick="filterAgents('planned',this)">○ Planned</div>
+  </div>
+  <div class="agents-grid" id="agentGrid"></div>
+</div>
+
+<div id="governance" class="section">
+  <div class="hero-strip">
+    <div class="hero-text"><h2>Governance &amp; Risk Framework</h2><p>Every FPRS AI tool operates within a tiered risk framework — defining human-in-the-loop requirements, data handling standards, and escalation paths. Governance enables adoption.</p></div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Risk Tiers</div></div>
+      <div class="stat"><div class="stat-num">100%</div><div class="stat-label">Tools Rated</div></div>
+      <div class="stat"><div class="stat-num">M365</div><div class="stat-label">Data Boundary</div></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;margin-bottom:32px;">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;border-top:4px solid #15803D;">
+      <div style="margin-bottom:12px;"><span class="risk-badge risk-low">● Low Risk — Tier 1: Assist</span></div>
+      <div style="font-family:var(--serif);font-size:19px;color:var(--navy);margin-bottom:8px;">AI drafts. Human acts.</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;">No automated decisions or external output. Examples: meeting summaries, draft emails, document Q&amp;A.</div>
+      <div class="cap-list">
+        <div class="cap-item"><span class="cap-check">✦</span> Human reviews all output before use</div>
+        <div class="cap-item"><span class="cap-check">✦</span> No PII required in prompt</div>
+        <div class="cap-item"><span class="cap-check">✦</span> M365 data boundary enforced</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Standard Copilot audit logging</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;border-top:4px solid #B45309;">
+      <div style="margin-bottom:12px;"><span class="risk-badge risk-med">◐ Medium Risk — Tier 2: Augment</span></div>
+      <div style="font-family:var(--serif);font-size:19px;color:var(--navy);margin-bottom:8px;">AI generates. Human approves.</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;">AI outputs feed a decision process. Named human approver required before any action. Examples: RFP drafts, new business checklists.</div>
+      <div class="cap-list">
+        <div class="cap-item"><span class="cap-check">✦</span> Named human approver in workflow</div>
+        <div class="cap-item"><span class="cap-check">✦</span> PII handling per Guardian data policy</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Output versioning and audit trail</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Quarterly prompt accuracy review</div>
+      </div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;border-top:4px solid #BE123C;">
+      <div style="margin-bottom:12px;"><span class="risk-badge risk-high">▲ High Risk — Tier 3: Advise</span></div>
+      <div style="font-family:var(--serif);font-size:19px;color:var(--navy);margin-bottom:8px;">AI advises. Compliance owns.</div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:14px;">Touches regulatory, legal, or claims decision content. Compliance sign-off required. No AI-only output ever reaches a claimant.</div>
+      <div class="cap-list">
+        <div class="cap-item"><span class="cap-check">✦</span> Compliance team sign-off required</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Legal review of all prompt templates</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Hard escalation path — no AI-only output</div>
+        <div class="cap-item"><span class="cap-check">✦</span> Monthly model performance review</div>
+      </div>
+    </div>
+  </div>
+  <div class="info-card" style="margin-bottom:24px;">
+    <h3 style="margin-bottom:4px;">Tool Risk Registry</h3>
+    <p class="sub" style="margin-bottom:20px;">All FPRS AI tools mapped to risk tier, HITL requirement, data classification, and review cadence.</p>
+    <table class="gov-table">
+      <thead><tr><th>Tool</th><th>Type</th><th>Risk Tier</th><th>Human-in-the-Loop</th><th>Data Class</th><th>Review</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Meeting Action Items</strong></td><td>Prompt</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-auto">Auto-use</span></td><td>Internal</td><td>Annual</td></tr>
+        <tr><td><strong>Executive Update Email</strong></td><td>Prompt</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-auto">Auto-use</span></td><td>Internal</td><td>Annual</td></tr>
+        <tr><td><strong>Product Comparison</strong></td><td>Prompt</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-review">Review before use</span></td><td>Internal</td><td>Semi-annual</td></tr>
+        <tr><td><strong>Retirement Income Summary</strong></td><td>Prompt</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-review">Review before use</span></td><td>Internal</td><td>Semi-annual</td></tr>
+        <tr><td><strong>Policy Language Simplifier</strong></td><td>Prompt</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-review">Legal review if customer-facing</span></td><td>Internal</td><td>Semi-annual</td></tr>
+        <tr><td><strong>Policy Q&amp;A Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-low" style="font-size:10px;">Low</span></td><td><span class="hitl-badge hitl-review">Review before acting</span></td><td>Internal</td><td>Quarterly</td></tr>
+        <tr><td><strong>RFP Response Drafting</strong></td><td>Prompt</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Underwriting approval required</span></td><td>Confidential</td><td>Quarterly</td></tr>
+        <tr><td><strong>SOP Draft</strong></td><td>Prompt</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Process owner approval</span></td><td>Internal</td><td>Quarterly</td></tr>
+        <tr><td><strong>Underwriting Risk Narrative</strong></td><td>Prompt</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Underwriting validation required</span></td><td>Confidential</td><td>Quarterly</td></tr>
+        <tr><td><strong>NB Checklist Review</strong></td><td>Prompt</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Underwriting review required</span></td><td>PII</td><td>Quarterly</td></tr>
+        <tr><td><strong>RFP &amp; Quote Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Underwriting approval required</span></td><td>Confidential</td><td>Quarterly</td></tr>
+        <tr><td><strong>New Business Intake Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Underwriting review required</span></td><td>PII</td><td>Quarterly</td></tr>
+        <tr><td><strong>Advisor Support Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-med" style="font-size:10px;">Med</span></td><td><span class="hitl-badge hitl-required">Advisor attestation</span></td><td>PII</td><td>Quarterly</td></tr>
+        <tr><td><strong>Claims Decision Summary</strong></td><td>Prompt</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Examiner sign-off</span></td><td>PII/PHI</td><td>Monthly</td></tr>
+        <tr><td><strong>IME Report Summarizer</strong></td><td>Prompt</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Examiner sign-off</span></td><td>PII/PHI</td><td>Monthly</td></tr>
+        <tr><td><strong>Appeals Letter Draft</strong></td><td>Prompt</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Examiner sign-off</span></td><td>PII</td><td>Monthly</td></tr>
+        <tr><td><strong>Claims Triage Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Examiner review</span></td><td>PII/PHI</td><td>Monthly</td></tr>
+        <tr><td><strong>Compliance SOP Agent</strong></td><td>Agent</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Compliance sign-off</span></td><td>Regulatory</td><td>Monthly</td></tr>
+        <tr><td><strong>Regulatory Change Impact</strong></td><td>Prompt</td><td><span class="risk-badge risk-high" style="font-size:10px;">High</span></td><td><span class="hitl-badge hitl-required">Compliance sign-off</span></td><td>Regulatory</td><td>Monthly</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="info-card">
+    <h3 style="margin-bottom:4px;">Guardian M365 Compliance Stack</h3>
+    <p class="sub" style="margin-bottom:20px;">All FPRS AI tools operate within Microsoft's enterprise data protection boundary. No data leaves the M365 tenant.</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+      <div style="background:var(--cream);border-radius:10px;padding:16px;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">🔒</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px;">Microsoft Purview</div><div style="font-size:11px;color:var(--text-muted);">DLP + sensitivity labels on all content accessed by Copilot</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:16px;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">🛡️</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px;">Agent 365</div><div style="font-size:11px;color:var(--text-muted);">Centralized agent governance, policy management, and monitoring</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:16px;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">📊</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px;">Copilot Analytics</div><div style="font-size:11px;color:var(--text-muted);">Adoption trends, prompt usage, escalation rates — monthly reporting</div></div>
+      <div style="background:var(--cream);border-radius:10px;padding:16px;text-align:center;"><div style="font-size:24px;margin-bottom:8px;">📋</div><div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:4px;">Audit Logging</div><div style="font-size:11px;color:var(--text-muted);">Full interaction history for compliance review and e-discovery</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="champion" class="section">
+  <div class="hero-strip">
+    <div class="hero-text"><h2>FPRS AI Champion Program</h2><p>A peer-led network that accelerates AI adoption across business units — moving from centralized enablement to distributed fluency across FPRS.</p></div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">3</div><div class="stat-label">Phases</div></div>
+      <div class="stat"><div class="stat-num">Q3</div><div class="stat-label">Full Launch</div></div>
+      <div class="stat"><div class="stat-num">30+</div><div class="stat-label">Target Champions</div></div>
+    </div>
+  </div>
+  <div class="champion-grid">
+    <div class="info-card">
+      <h3>Program Rollout Phases</h3>
+      <p class="sub">A structured 3-phase approach from foundation to scale — building sustainable AI fluency without central bottlenecks.</p>
+      <div class="phase-list">
+        <div class="phase"><div class="phase-num">1</div><div class="phase-content"><h4>Foundation — Identify &amp; Equip (Q1–Q2)</h4><p>Recruit 1–2 champions per business unit. Deliver Copilot fundamentals training, provide prompt library access, establish feedback loop. Define champion charter and recognition structure.</p></div></div>
+        <div class="phase"><div class="phase-num">2</div><div class="phase-content"><h4>Activation — Build &amp; Share (Q2–Q3)</h4><p>Champions build their first unit-specific prompts and simple agents. Monthly showcase sessions share wins. Central team publishes adoption dashboards and identifies friction points. Prompt library grows from champion contributions.</p></div></div>
+        <div class="phase"><div class="phase-num">3</div><div class="phase-content"><h4>Scale — Sustain &amp; Govern (Q3+)</h4><p>Champions evolve into embedded AI advisors for their teams. Governance framework ensures quality and compliance. Peer-to-peer learning reduces dependence on central AI team.</p></div></div>
+      </div>
+    </div>
+    <div>
+      <div class="sidebar-card" style="margin-bottom:20px;">
+        <h3>Program KPIs</h3>
+        <p class="sub">Tracked monthly. Reported to FPRS leadership quarterly.</p>
+        <div class="metric-list">
+          <div class="metric-row"><span class="metric-row-label">Active Champions</span><span class="metric-row-val">8 / 30</span></div>
+          <div class="metric-row"><span class="metric-row-label">BUs Represented</span><span class="metric-row-val">4 / 6</span></div>
+          <div class="metric-row"><span class="metric-row-label">Prompts Published</span><span class="metric-row-val">14</span></div>
+          <div class="metric-row"><span class="metric-row-label">Monthly Active Users</span><span class="metric-row-val">~210</span></div>
+          <div class="metric-row"><span class="metric-row-label">Avg. Time Saved / User</span><span class="metric-row-val">2.4 hrs</span></div>
+        </div>
+      </div>
+      <div class="info-card">
+        <h3 style="font-size:17px;margin-bottom:14px;">Champion Toolkit</h3>
+        <div class="cap-list">
+          <div class="cap-item"><span class="cap-check">✦</span> Prompt Library access &amp; contribution rights</div>
+          <div class="cap-item"><span class="cap-check">✦</span> Copilot Studio sandbox environment</div>
+          <div class="cap-item"><span class="cap-check">✦</span> Monthly enablement office hours</div>
+          <div class="cap-item"><span class="cap-check">✦</span> Showcase spotlight &amp; peer recognition</div>
+          <div class="cap-item"><span class="cap-check">✦</span> Direct channel to AI governance team</div>
+          <div class="cap-item"><span class="cap-check">✦</span> Quarterly all-champion summit</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOv(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div><div class="modal-title" id="modalTitle"></div><div id="modalTags" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div></div>
+      <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+var PROMPTS=[
+  {key:'rfp',cat:'ops',icon:'📋',ibg:'#EFF6FF',title:'RFP Response Drafting',desc:'Generate a structured RFP response for group life or disability proposals. Reduces turnaround from days to hours.',snippet:'Draft an RFP response for [product type] coverage. Client: [company name], [# employees] employees. Requirements: [list]…',complexity:2,risk:'med',tags:'<span class="tag tag-ops">Operations</span>',prompt:'Draft an RFP response for [product type] coverage.\nClient: [company name], [# employees] employees.\nKey requirements: [list requirements].\nEmphasize Guardian\'s [differentiators].\n\nFormat:\n1. Executive Summary (2-3 sentences)\n2. Product Overview and fit to requirements\n3. Pricing approach and structure\n4. Guardian differentiators vs. market\n5. Proposed next steps and timeline\n\nTone: professional, consultative. Length: 400-600 words.',useCases:['Group life or disability RFP responses for employer clients','Renewals requiring a refreshed proposal narrative','Competitive re-bids where differentiation is the deciding factor'],tips:['Replace [differentiators] with specific Guardian strengths relevant to this client.','For large accounts, run multiple times with different emphasis and select the strongest.','Combine with the Product Comparison prompt for complex multi-product RFPs.']},
+  {key:'claims-summary',cat:'claims',icon:'⚖️',ibg:'#FFF7ED',title:'Claims Decision Summary',desc:'Summarize a disability or life claims file into a structured decision memo for reviewers and managers.',snippet:'Summarize this claims file for [claim type]. Output: eligibility status, key evidence, decision rationale, next steps…',complexity:1,risk:'high',tags:'<span class="tag tag-claims">Claims</span>',prompt:'Summarize the following claims file for [claim type].\nClaimant: [details].\n\nOutput format:\n1. Eligibility Status: [Eligible / Not Eligible / Pending]\n2. Key Evidence: 3-5 most relevant facts\n3. Decision Rationale: 2-3 sentences\n4. Recommended Next Steps: numbered action list\n\nFile content: [paste content]\n\nNote: A qualified examiner must review all AI-generated summaries before any decision is communicated to the claimant.',useCases:['Disability claim file summarization for examiner review','Life claims documentation review prior to payment','Manager review prep for complex or disputed claims'],tips:['For complex files, break into sections and run separately, then combine.','Always have a qualified examiner review before any decision is communicated — Tier 3 HITL requirement.','Flag outputs where the model expresses low confidence — escalate those immediately.']},
+  {key:'uw-risk',cat:'underwriting',icon:'🔬',ibg:'#F0FDF4',title:'Underwriting Risk Narrative',desc:'Translate underwriting data into a plain-language risk narrative for internal documentation or client communication.',snippet:'Write a risk narrative for [applicant/group] applying for [product]. Key risk factors: [factors]. Action: [approve/decline/modify]…',complexity:2,risk:'med',tags:'<span class="tag tag-underwriting">Underwriting</span>',prompt:'Write a risk narrative for [applicant/group] applying for [product].\nKey risk factors: [factors].\nRecommended action: [approve / decline / modify with conditions].\nAudience: [internal documentation / client communication].\n\nInclude:\n- Risk summary (2-3 sentences)\n- Supporting rationale for each key factor\n- Recommended conditions, exclusions, or modifications\n- Confidence level: [High / Medium / Low]\n\nTone: objective, professional.',useCases:['Individual life underwriting documentation','Group disability case risk summaries','File preparation for reinsurance submissions'],tips:['Specify audience carefully — internal vs. client language differs significantly.','For borderline cases, run with both approve and decline framings to stress-test the rationale.','Underwriter must validate all risk factors before this narrative is used in any decision record.']},
+  {key:'product-compare',cat:'advisor',icon:'💼',ibg:'#FDF4FF',title:'Product Comparison for Advisor',desc:'Generate a side-by-side comparison of Guardian life or annuity products for a specific client profile.',snippet:'Compare [Product A] vs [Product B] for client age [age], risk profile [profile], goal [objective]. Format as table…',complexity:1,risk:'low',tags:'<span class="tag tag-advisor">Advisor Support</span>',prompt:'Compare [Product A] vs [Product B] for a client:\n- Age: [age]\n- Risk tolerance: [conservative / moderate / aggressive]\n- Primary goal: [income protection / wealth transfer / retirement income]\n- Budget: [monthly/annual premium range]\n\nFormat as a structured table with:\n- Key features\n- Cost comparison\n- Pros for this client\n- Cons for this client\n- Suitability notes\n\nEnd with a 2-3 sentence recommendation. Avoid jargon.',useCases:['Pre-meeting prep for advisor client consultations','Explaining tradeoffs between term vs. whole life','Annuity product selection guidance for retirement planning clients'],tips:['Always verify product details match current Guardian product guides.','Pair with the Retirement Income Summary prompt for annuity-focused conversations.','Advisor should review suitability notes against the client\'s actual financial plan before presenting.']},
+  {key:'policy-simplify',cat:'compliance',icon:'📄',ibg:'#FFF1F2',title:'Policy Language Simplifier',desc:'Rewrite dense policy or contract language into plain English for policyholders or frontline staff.',snippet:'Rewrite the following policy clause in plain English for [audience]. Keep all meaning intact. Flag terms requiring legal review…',complexity:1,risk:'low',tags:'<span class="tag tag-compliance">Compliance</span>',prompt:'Rewrite the following policy clause in plain English.\nTarget audience: [policyholder / frontline agent / operations staff].\nReading level: [8th grade / professional].\n\nRequirements:\n- Keep all meaning intact\n- Replace legal jargon with everyday language\n- Flag any terms that may require legal review before customer-facing use\n- If a sentence cannot be simplified without misinterpretation risk, note it clearly\n\nClause: [paste clause]',useCases:['Policyholder communication simplification','New agent onboarding training materials','Customer service FAQ generation from policy language'],tips:['Always have Legal or Compliance review simplified language before any customer-facing use.','Specify reading level to control output formality.','For long sections, process clause by clause for better accuracy.']},
+  {key:'meeting-actions',cat:'productivity',icon:'📝',ibg:'#F0FDFA',title:'Meeting Action Items',desc:'Extract structured action items, owners, and deadlines from a Teams meeting transcript or notes.',snippet:'From these meeting notes, extract: action items with owners and deadlines, key decisions, open questions…',complexity:1,risk:'low',tags:'<span class="tag tag-productivity">Productivity</span>',prompt:'From the following meeting notes or Teams transcript, extract:\n\n1. Action Items\n   - Task description\n   - Owner (name or role)\n   - Due date or timeline\n\n2. Key Decisions Made\n   - One sentence per decision\n\n3. Open Questions / Parking Lot\n   - Items requiring follow-up\n\nFormat as a structured list. Flag unclear owners or dates with [TBD].\n\nMeeting notes: [paste transcript or notes]',useCases:['Post-meeting follow-up for FPRS leadership calls','Product team sprint retrospectives','Cross-functional program reviews and steering committee sessions'],tips:['Works best with Teams transcript — include speaker labels if available.','Run immediately after the meeting while context is fresh.','Add "distribute to: [names]" at the end to generate a ready-to-send summary email.']},
+  {key:'appeals-letter',cat:'claims',icon:'✉️',ibg:'#FFF7ED',title:'Appeals Letter Draft',desc:'Draft a professional, empathetic response to a claimant appeals request, aligned with Guardian\'s communication standards.',snippet:'Draft an appeals response for [claim type]. Outcome: [uphold/overturn]. Reason: [rationale]. Tone: professional and empathetic…',complexity:2,risk:'high',tags:'<span class="tag tag-claims">Claims</span>',prompt:'Draft an appeals response letter for [claim type].\n\nDetails:\n- Claimant name: [name]\n- Appeal outcome: [uphold original decision / overturn decision]\n- Decision rationale: [describe]\n- Policy provision(s) cited: [list]\n\nRequirements:\n- Tone: professional, empathetic, and clear\n- Acknowledge the claimant\'s situation with genuine care\n- Explain the decision in plain language\n- State the next steps available to the claimant\n- Do not use adversarial or dismissive language\n\nLength: 250-350 words. Must be reviewed by examiner before sending.',useCases:['Disability claim appeal response letters','Life claim benefit dispute communications','Denial letters requiring compassionate but firm tone'],tips:['Examiner sign-off required before any letter is sent — Tier 3 HITL requirement.','Adjust tone based on complexity of the appeal — longer claim histories warrant more acknowledgment.','Always cite the specific policy provision — vague rationale increases re-appeal rates.']},
+  {key:'sop-draft',cat:'ops',icon:'⚙️',ibg:'#EFF6FF',title:'SOP Draft from Process Notes',desc:'Convert informal process notes or walkthrough descriptions into a structured, formatted SOP document.',snippet:'Convert these process notes into a formatted SOP. Include: purpose, scope, procedure, roles, exception handling…',complexity:2,risk:'med',tags:'<span class="tag tag-ops">Operations</span>',prompt:'Convert the following process notes into a formatted Standard Operating Procedure (SOP).\n\nDepartment: [team name]\nProcess name: [title]\n\nInclude:\n1. Purpose\n2. Scope\n3. Step-by-Step Procedure with role assignments\n4. Exception Handling\n5. Related Documents: [list if known]\n6. Revision History: [Date: TBD | Author: TBD | Version: 1.0]\n\nProcess notes: [paste notes]',useCases:['Documenting tribal knowledge before team transitions','Standardizing inconsistent processes across FPRS units','Creating baseline SOPs for new AI-assisted workflows'],tips:['The more detailed the process notes, the better the output.','Have the process owner review exception handling specifically.','Combine with the Process Improvement Brief to identify optimization opportunities.']},
+  {key:'retirement-illus',cat:'advisor',icon:'📊',ibg:'#FDF4FF',title:'Retirement Income Summary',desc:'Summarize an annuity illustration into a plain-language client narrative with key income projections highlighted.',snippet:'Summarize this annuity illustration for a client conversation. Age: [age], Premium: [amount]. Highlight: income, death benefit…',complexity:1,risk:'low',tags:'<span class="tag tag-advisor">Advisor Support</span>',prompt:'Summarize the following annuity illustration for a client conversation.\n\nClient profile:\n- Age: [age]\n- Purchase premium: [amount]\n- Product: [product name]\n- Income start date: [date]\n\nSummarize in plain language:\n1. Monthly income amount (guaranteed)\n2. Death benefit summary\n3. Key rider benefits (if any)\n4. One key tradeoff the client should understand\n\nAvoid actuarial jargon. Length: 150-200 words. End with a suggested conversation opener for the advisor.',useCases:['Pre-client meeting prep for annuity discussions','Explaining income rider mechanics in plain language','Comparing two annuity illustration scenarios side-by-side'],tips:['Always verify illustration data matches current Guardian product specs before client use.','Add "compare to [Product B] illustration" to generate a side-by-side.','The suggested conversation opener is often the most useful output — use it as a talk track starting point.']},
+  {key:'reg-change',cat:'compliance',icon:'🏛️',ibg:'#FFF1F2',title:'Regulatory Change Impact',desc:'Analyze a regulatory update and summarize its impact on FPRS products, processes, or customer communications.',snippet:'Summarize this regulatory update and its impact on [product line]. Identify: process changes, affected segments, timeline…',complexity:3,risk:'high',tags:'<span class="tag tag-compliance">Compliance</span>',prompt:'Summarize the following regulatory update and its operational impact on FPRS.\n\nProduct lines affected: [life / disability / annuity / all]\n\nStructure your response as:\n1. Summary: What the regulation requires (2-3 sentences)\n2. Process Changes Required: specific FPRS workflows that must change\n3. Affected Customer Segments: who is impacted and how\n4. Required Customer Communications: what must be communicated and by when\n5. Compliance Deadline: [date if stated]\n6. Open Questions: items requiring legal or compliance clarification\n\nRegulation text: [paste]\n\nNote: Compliance team review required before any action is taken.',useCases:['State insurance regulation change impact assessments','Federal guidance updates affecting disability or annuity products','Pre-audit compliance gap analysis support'],tips:['Tier 3 tool — compliance sign-off required before any process changes are initiated.','Run once for overview, then re-run with "focus only on [specific workflow]" for deeper analysis.','Do not act on AI interpretation of ambiguous regulatory language.']},
+  {key:'exec-email',cat:'productivity',icon:'📧',ibg:'#F0FDFA',title:'Executive Update Email',desc:'Draft a concise, data-backed status update email for senior leadership on a project, initiative, or metric.',snippet:'Draft a 3-paragraph executive update on [topic]. Status: [on track/at risk]. Key metrics: [data]. Decision needed: [describe]…',complexity:1,risk:'low',tags:'<span class="tag tag-productivity">Productivity</span>',prompt:'Draft a concise executive status update email.\n\nTopic/Project: [name]\nRecipient: [role/name]\nCurrent status: [On Track / At Risk / Complete / Blocked]\nKey metrics: [list 2-3 data points]\nDecision or action needed: [describe or "None - informational only"]\n\nStructure:\n- Para 1: Status and headline metric\n- Para 2: Key progress or issue with context\n- Para 3: Ask or next steps\n\nTone: concise, confident, data-backed. Maximum 200 words. No bullet points. Include subject line.',useCases:['Weekly AI program status updates to FPRS leadership','Project milestone communications to leadership','Risk or issue escalation emails requiring executive awareness'],tips:['The 200-word constraint forces prioritization — do not remove it.','For "At Risk" updates, be specific about the risk — vague emails lose credibility.','Run once, then ask: "Rewrite the opening sentence to be more direct."']},
+  {key:'nb-checklist',cat:'underwriting',icon:'✅',ibg:'#F0FDF4',title:'New Business Checklist Review',desc:'Identify missing fields or documentation gaps in a new business application before it reaches underwriting.',snippet:'Review this new business application for [product type]. Identify: missing fields, inconsistencies, items needing clarification…',complexity:2,risk:'med',tags:'<span class="tag tag-underwriting">Underwriting</span>',prompt:'Review the following new business application for [product type].\n\nIdentify and list:\n1. Missing Required Fields — field name and why it\'s needed\n2. Data Inconsistencies — conflicts between fields\n3. Incomplete Sections — present but insufficient detail\n4. Items Needing Clarification — ambiguous responses that may cause NIGO\n\nFormat as a prioritized checklist. Mark each: [Critical / Important / Minor].\n\nApplication data: [paste]',useCases:['Pre-underwriting NIGO reduction for life applications','Disability new business quality review before submission','Agent/broker support to reduce application rejection rates'],tips:['Defining product type precisely improves field-level accuracy.','Focus agent callbacks on Critical items first.','Track which field types generate the most flags over time.']},
+  {key:'process-brief',cat:'ops',icon:'🔄',ibg:'#EFF6FF',title:'Process Improvement Brief',desc:'Generate a structured process improvement brief from a pain point description — ideal for Lean/Six Sigma initiatives.',snippet:'Create a process improvement brief for: [problem]. Team: [dept]. Current state: [describe]. Target: [outcome]…',complexity:3,risk:'low',tags:'<span class="tag tag-ops">Operations</span>',prompt:'Create a structured process improvement brief.\n\nProblem description: [describe the issue in 2-3 sentences]\nDepartment/team: [name]\nCurrent state: [describe what happens today]\nDesired outcome: [what good looks like]\n\nFormat:\n1. Problem Statement — crisp, measurable framing\n2. Root Cause Hypotheses — 3-5 likely causes (not solutions)\n3. Proposed Solutions — 2-3 options with effort (L/M/H) and impact (L/M/H)\n4. Recommended Solution — with rationale\n5. Success Metrics — how we\'ll know it worked\n6. Suggested Owner — [role, not name]',useCases:['Lean/Six Sigma initiative scoping for FPRS operations','Pre-meeting brief for process redesign working sessions','AI adoption friction point analysis and remediation planning'],tips:['The root cause hypotheses section is the most valuable part — do not skip it.','Use this before building a Copilot Studio agent — it forces clarity on the problem.','The Effort vs. Impact framing often reveals low-effort/high-impact options that are overlooked.']},
+  {key:'ime-summary',cat:'claims',icon:'🩺',ibg:'#FFF7ED',title:'IME / Medical Report Summarizer',desc:'Summarize Independent Medical Examination or attending physician reports into key findings for claims reviewers.',snippet:'Summarize this medical report for a disability claims reviewer. Extract: diagnosis, limitations, RTW prognosis, inconsistencies…',complexity:2,risk:'high',tags:'<span class="tag tag-claims">Claims</span>',prompt:'Summarize the following medical report for a disability claims reviewer.\n\nReport type: [IME / APS / FCE / other]\n\nExtract and structure:\n1. Primary Diagnosis — ICD code if present\n2. Functional Limitations — specific restrictions on activities\n3. Current Treatment Plan — medications, therapy, follow-up schedule\n4. Return-to-Work Prognosis — timeline and any conditions\n5. Inconsistencies or Gaps — anything contradictory or requiring follow-up\n6. Examiner Recommendation (if stated)\n\nReport: [paste report]\n\nThis summary is for reviewer use only. A qualified examiner must validate all findings before use in any claims decision.',useCases:['Disability claims complex case file review prep','IME summary for examiner queue management','Medical evidence comparison across multiple physician reports'],tips:['Tier 3 tool — examiner validation required before any summary informs a claims decision.','The "Inconsistencies or Gaps" section is often the highest-value output.','For multi-report cases, run on each report separately, then ask for a comparison of material differences.']}
+];
+
+var AGENTS=[
+  {key:'rfp-agent',status:'ready',icon:'📋',ibg:'#EFF6FF',name:'RFP & Quote Agent',type:'Operations · Copilot Studio',desc:'Automates proposal and RFP generation for group life and disability products. Pulls from SharePoint product catalog and prior winning proposals. Reduces turnaround from 5-7 days to same-day.',caps:['Ingest RFP requirements from email or Teams form','Match to Guardian product catalog via RAG on SharePoint','Draft structured proposal with pricing narrative','Route to underwriter for review via Power Automate approval'],m1:'5→1',ml1:'Days → Day',m2:'~70%',ml2:'Effort Saved',m3:'Low',ml3:'Risk',arch:[{i:'📧',l:'Trigger',v:'Email / Teams Form'},{i:'🧠',l:'Copilot Studio',v:'Agent + RAG'},{i:'📂',l:'Knowledge',v:'SharePoint Library'},{i:'✍️',l:'Output',v:'Draft Proposal'},{i:'👤',l:'HITL',v:'Underwriting Approval'},{i:'📤',l:'Delivery',v:'Teams / Email'}],trigger:'Email or Teams form submission containing RFP requirements',dataSource:'SharePoint: Product catalog, pricing tables, prior proposals',output:'Structured proposal document routed to underwriter via Power Automate approval',hitl:'Underwriter approval required before proposal leaves Guardian',governance:'Output versioned in SharePoint. Approval logged in Purview audit trail. Quarterly prompt accuracy review.'},
+  {key:'claims-agent',status:'ready',icon:'⚖️',ibg:'#FFF7ED',name:'Claims Triage Agent',type:'Claims · Copilot Studio',desc:'First-touch handler for incoming disability and life claims. Gathers documentation, checks eligibility, generates intake summary, and routes to the right claims examiner queue without manual triage.',caps:['Structured intake via guided Copilot Studio conversation','Documentation checklist and gap detection','Initial eligibility screening against policy rules','Auto-route to appropriate examiner queue'],m1:'~40%',ml1:'Faster Intake',m2:'↓30%',ml2:'Rework Rate',m3:'High',ml3:'Risk',arch:[{i:'📬',l:'Trigger',v:'New Claim Submission'},{i:'🤖',l:'Copilot Studio',v:'Guided Intake'},{i:'📋',l:'Knowledge',v:'Eligibility Rules'},{i:'📄',l:'Output',v:'Intake Summary'},{i:'👤',l:'HITL',v:'Examiner Review'},{i:'📂',l:'Delivery',v:'Examiner Queue'}],trigger:'New claim submission via portal, email, or Teams channel',dataSource:'Policy admin system (read-only), SharePoint: SOP library, eligibility rules',output:'Structured intake summary + routing decision delivered to claims examiner queue',hitl:'Examiner reviews intake summary before any eligibility determination is recorded',governance:'All intake summaries logged. Routing decisions auditable. Monthly accuracy review with claims leadership.'},
+  {key:'policy-agent',status:'ready',icon:'📚',ibg:'#F0FDFA',name:'Policy Q&A Agent',type:'Knowledge · Copilot Studio',desc:'Grounded Q&A agent over Guardian\'s internal policy documents, rider guides, and product manuals. Enables staff to get instant, source-cited answers without document searching.',caps:['RAG over SharePoint policy library with source citations','Plain-language answers with confidence indicators','Product comparison on demand','Escalate ambiguous queries to compliance inbox'],m1:'~85%',ml1:'Self-Serve',m2:'↓50%',ml2:'Lookup Time',m3:'Low',ml3:'Risk',arch:[{i:'💬',l:'Trigger',v:'User Question'},{i:'🔍',l:'RAG',v:'SharePoint Search'},{i:'📚',l:'Knowledge',v:'Policy Library'},{i:'💡',l:'Output',v:'Answer + Citation'},{i:'⚠️',l:'Escalation',v:'Compliance Inbox'},{i:'📊',l:'Analytics',v:'Usage Dashboard'}],trigger:'User question via Teams, SharePoint, or embedded web chat',dataSource:'SharePoint: Policy documents, rider guides, product manuals, FAQ library',output:'Plain-language answer with source citations and confidence indicator',hitl:'Human reviews answer before acting. Ambiguous queries auto-escalate to compliance inbox.',governance:'All queries logged for pattern analysis. Escalation rate tracked monthly. Prompt library updated quarterly.'},
+  {key:'advisor-agent',status:'pilot',icon:'💼',ibg:'#FDF4FF',name:'Advisor Support Agent',type:'Advisor · Copilot Studio',desc:'Embedded assistant for financial advisors to answer client questions on life, annuity, and disability products in real time. Surfaces suitability guidance and generates client-ready summaries.',caps:['Real-time product Q&A grounded in advisor knowledge base','Client-ready summary and illustration narrative generation','Suitability flag based on client profile inputs','Meeting prep and follow-up email drafting'],m1:'+25%',ml1:'Productivity',m2:'↑20%',ml2:'Cross-Sell',m3:'Med',ml3:'Risk',arch:[{i:'👔',l:'Trigger',v:'Advisor Query'},{i:'🧠',l:'Copilot Studio',v:'Agent + RAG'},{i:'📊',l:'Knowledge',v:'Products + Suitability'},{i:'💼',l:'Output',v:'Answer / Summary'},{i:'👤',l:'HITL',v:'Advisor Attestation'},{i:'📤',l:'Delivery',v:'Client / CRM'}],trigger:'Advisor query via Teams or advisor portal widget',dataSource:'SharePoint: Product guides, illustration data, suitability rules, client profile (advisor-input)',output:'Real-time product answer, client-ready summary, or meeting follow-up email draft',hitl:'Advisor reviews and approves all client-facing outputs. Suitability flags require advisor acknowledgment.',governance:'Suitability flag acknowledgment logged. Client-facing content requires advisor attestation. Quarterly review.'},
+  {key:'compliance-agent',status:'planned',icon:'🏛️',ibg:'#FFF1F2',name:'Compliance SOP Agent',type:'Compliance · Copilot Studio',desc:'Conversational agent grounded in FPRS SOPs, regulatory guidance, and compliance documentation. Reduces compliance lookup time and ensures consistent interpretation across teams.',caps:['Q&A over SOPs and regulatory guidance docs','Flag recent regulatory changes by topic area','Generate compliance checklists on demand','Hard escalation to compliance team for ambiguous queries'],m1:'↓60%',ml1:'Lookup Time',m2:'↑',ml2:'Consistency',m3:'High',ml3:'Risk',arch:[{i:'❓',l:'Trigger',v:'Compliance Query'},{i:'🔍',l:'RAG',v:'SOP + Reg Library'},{i:'⚖️',l:'Routing',v:'Confidence Check'},{i:'✅',l:'Low Risk',v:'Cited Answer'},{i:'🚨',l:'High Risk',v:'Compliance Escalation'},{i:'📋',l:'Audit',v:'Full Query Log'}],trigger:'Staff query via Teams compliance channel',dataSource:'SharePoint: FPRS SOPs, state/federal regulatory guidance, compliance rulings',output:'Cited answer or checklist with hard escalation for ambiguous queries',hitl:'Hard escalation required for any regulatory interpretation query. No auto-answer on Tier 3 content.',governance:'All queries logged. Ambiguous escalation rate tracked. Monthly review with compliance leadership.'},
+  {key:'nb-agent',status:'planned',icon:'🔄',ibg:'#F0FDF4',name:'New Business Intake Agent',type:'Underwriting · Copilot Studio',desc:'Automates new business application intake for life and disability products. Validates completeness, flags gaps, and generates a structured handoff package for underwriting review.',caps:['Multi-step intake via Copilot Studio adaptive cards','Required field validation and NIGO gap alerts','Underwriting package generation and hand-off','Status tracking and applicant/agent notifications'],m1:'~50%',ml1:'Faster Intake',m2:'↓40%',ml2:'NIGOs',m3:'Med',ml3:'Risk',arch:[{i:'📝',l:'Trigger',v:'Application Submission'},{i:'🤖',l:'Copilot Studio',v:'Validation Agent'},{i:'📋',l:'Knowledge',v:'Underwriting Rules + NIGO'},{i:'📦',l:'Output',v:'Validated Package'},{i:'👤',l:'HITL',v:'Underwriting Review'},{i:'📂',l:'Delivery',v:'Underwriting Queue'}],trigger:'Agent/broker submits application via portal or Teams form',dataSource:'SharePoint: Required field rules by product, NIGO reason library, underwriting guidelines',output:'Validated application package + NIGO report routed to underwriting queue',hitl:'Underwriter reviews NIGO flags before any application is declined or held.',governance:'All intake validations logged. NIGO reason codes tracked for form redesign insights. Quarterly accuracy review.'}
+];
+
+function dots(n){return[1,2,3].map(function(i){return'<div class="dot'+(i<=n?' filled':'')+'"></div>';}).join('');}
+function complexLabel(n){return n===1?'Beginner':n===2?'Intermediate':'Advanced';}
+
+function renderPrompts(){
+  document.getElementById('promptGrid').innerHTML=PROMPTS.map(function(p){
+    return '<div class="prompt-card" data-category="'+p.cat+'" data-title="'+p.title+'" onclick="openPromptModal(\''+p.key+'\')">'
+      +'<div class="card-header"><div class="card-icon" style="background:'+p.ibg+'">'+p.icon+'</div><div class="card-tags">'+p.tags+'</div></div>'
+      +'<div class="card-title">'+p.title+'</div>'
+      +'<div class="card-desc">'+p.desc+'</div>'
+      +'<div class="prompt-box">'+p.snippet.replace(/\[([^\]]+)\]/g,'<span class="prompt-var">[$1]</span>')+'</div>'
+      +'<div class="card-footer"><div class="complexity"><div class="complexity-dots">'+dots(p.complexity)+'</div>'+complexLabel(p.complexity)+'</div>'
+      +'<button class="copy-btn" onclick="quickCopy(event,\''+p.key+'\')">Copy</button></div>'
+      +'</div>';
+  }).join('');
+}
+
+function renderAgents(){
+  document.getElementById('agentGrid').innerHTML=AGENTS.map(function(a){
+    var statusLabel=a.status==='ready'?'Pilot-Ready':a.status==='pilot'?'In Pilot':'Planned';
+    return '<div class="agent-card" data-status="'+a.status+'">'
+      +'<div class="agent-header"><div class="agent-icon-wrap" style="background:'+a.ibg+'">'+a.icon+'</div>'
+      +'<div class="agent-meta"><div class="agent-name">'+a.name+'</div><div class="agent-type">'+a.type+'</div></div>'
+      +'<span class="agent-status status-'+a.status+'">'+statusLabel+'</span></div>'
+      +'<div class="agent-body"><div class="agent-desc">'+a.desc+'</div>'
+      +'<div class="agent-capabilities"><div class="cap-label">Capabilities</div><div class="cap-list">'+a.caps.map(function(c){return'<div class="cap-item"><span class="cap-check">✦</span>'+c+'</div>';}).join('')+'</div></div>'
+      +'<div class="agent-metrics">'
+      +'<div class="metric"><div class="metric-val">'+a.m1+'</div><div class="metric-lbl">'+a.ml1+'</div></div>'
+      +'<div class="metric"><div class="metric-val">'+a.m2+'</div><div class="metric-lbl">'+a.ml2+'</div></div>'
+      +'<div class="metric"><div class="metric-val">'+a.m3+'</div><div class="metric-lbl">'+a.ml3+'</div></div>'
+      +'</div>'
+      +'<div class="agent-footer">'
+      +'<button class="btn-outline" style="flex:none;width:100%;" onclick="openAgentModal(\''+a.key+'\')">View Architecture</button>'
+      +'</div></div></div>';
+  }).join('');
+}
+
+renderPrompts();
+renderAgents();
+
+function switchTab(id,el){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  el.classList.add('active');
+}
+function filterPrompts(cat,el){
+  document.querySelectorAll('.filter-bar .filter-chip').forEach(function(c){if(c.getAttribute('onclick')&&c.getAttribute('onclick').indexOf('filterPrompts')>-1)c.classList.remove('active');});
+  el.classList.add('active');
+  document.querySelectorAll('#promptGrid .prompt-card').forEach(function(card){card.classList.toggle('hidden',cat!=='all'&&card.dataset.category!==cat);});
+}
+function filterAgents(status,el){
+  document.querySelectorAll('.filter-bar .filter-chip').forEach(function(c){if(c.getAttribute('onclick')&&c.getAttribute('onclick').indexOf('filterAgents')>-1)c.classList.remove('active');});
+  el.classList.add('active');
+  document.querySelectorAll('#agentGrid .agent-card').forEach(function(card){card.classList.toggle('hidden',status!=='all'&&card.dataset.status!==status);});
+}
+function searchPrompts(val){
+  var q=val.toLowerCase();
+  document.querySelectorAll('#promptGrid .prompt-card').forEach(function(card){
+    var match=card.dataset.title.toLowerCase().indexOf(q)>-1||card.querySelector('.card-desc').textContent.toLowerCase().indexOf(q)>-1;
+    card.classList.toggle('hidden',q.length>0&&!match);
+  });
+}
+function quickCopy(e,key){
+  e.stopPropagation();
+  var p=PROMPTS.filter(function(x){return x.key===key;})[0];
+  if(!p)return;
+  var btn=e.target;
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      navigator.clipboard.writeText(p.prompt).then(function(){btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied');},2000);}).catch(function(){fallback(p.prompt,btn);});
+    } else { fallback(p.prompt,btn); }
+  } catch(err){ fallback(p.prompt,btn); }
+}
+function fallback(text,btn){
+  try{
+    var ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.focus();ta.select();document.execCommand('copy');document.body.removeChild(ta);
+    if(btn){btn.textContent='Copied!';btn.classList.add('copied');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied');},2000);}
+  } catch(e){}
+}
+function openPromptModal(key){
+  var d=PROMPTS.filter(function(x){return x.key===key;})[0];if(!d)return;
+  document.getElementById('modalTitle').textContent=d.title;
+  var rLabel=d.risk==='low'?'● Low Risk':d.risk==='med'?'◐ Med Risk':'▲ High Risk';
+  document.getElementById('modalTags').innerHTML=d.tags+' <span class="risk-badge risk-'+d.risk+'" style="font-size:10px;">'+rLabel+'</span>';
+  var promptHtml=d.prompt.replace(/\[([^\]]+)\]/g,'<span class="prompt-var">[$1]</span>');
+  document.getElementById('modalBody').innerHTML=
+    '<div class="modal-tabs">'
+    +'<div class="modal-tab active" onclick="switchMTab(\'prompt\',this)">Prompt Template</div>'
+    +'<div class="modal-tab" onclick="switchMTab(\'usecases\',this)">Use Cases</div>'
+    +'<div class="modal-tab" onclick="switchMTab(\'tips\',this)">Tips</div>'
+    +'</div>'
+    +'<div id="mtab-prompt" class="modal-tab-content active">'
+    +'<div class="modal-section-label">Full Prompt Template</div>'
+    +'<div class="full-prompt">'+promptHtml+'</div>'
+    +'<button class="modal-copy-btn" onclick="var t=document.querySelector(\'.full-prompt\').innerText;fallback(t,this,\'Copy Full Prompt\')">Copy Full Prompt</button>'
+    +'</div>'
+    +'<div id="mtab-usecases" class="modal-tab-content">'
+    +'<div class="modal-section-label">Best For</div>'
+    +'<ul class="use-case-list">'+d.useCases.map(function(u){return'<li>'+u+'</li>';}).join('')+'</ul>'
+    +'</div>'
+    +'<div id="mtab-tips" class="modal-tab-content">'
+    +'<div class="modal-section-label">Tips for Best Results</div>'
+    +'<div class="tips-list">'+d.tips.map(function(t){return'<div class="tip-item">'+t+'</div>';}).join('')+'</div>'
+    +'</div>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function openAgentModal(key){
+  var d=AGENTS.filter(function(x){return x.key===key;})[0];if(!d)return;
+  document.getElementById('modalTitle').textContent=d.name+' — Architecture';
+  var rClass=d.m3==='Low'?'risk-low':d.m3==='Med'?'risk-med':'risk-high';
+  var rLabel=d.m3==='Low'?'● Low Risk':d.m3==='Med'?'◐ Med Risk':'▲ High Risk';
+  document.getElementById('modalTags').innerHTML='<span class="risk-badge '+rClass+'" style="font-size:10px;">'+rLabel+'</span>';
+  var archHtml=d.arch.map(function(n,i){return'<div class="arch-node"'+(i===d.arch.length-1?' style="margin-right:0"':'')+'>'+
+    '<div class="arch-node-icon">'+n.i+'</div>'+
+    '<div class="arch-node-label">'+n.l+'</div>'+
+    '<div class="arch-node-val">'+n.v+'</div></div>';}).join('');
+  document.getElementById('modalBody').innerHTML=
+    '<div class="modal-tabs">'
+    +'<div class="modal-tab active" onclick="switchMTab(\'arch\',this)">Architecture</div>'
+    +'<div class="modal-tab" onclick="switchMTab(\'govdetail\',this)">Governance</div>'
+    +'</div>'
+    +'<div id="mtab-arch" class="modal-tab-content active">'
+    +'<div class="modal-section-label">Data Flow</div>'
+    +'<div class="arch-row">'+archHtml+'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;">'
+    +'<div><div class="modal-section-label">Trigger</div><div style="background:var(--cream);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6;">'+d.trigger+'</div></div>'
+    +'<div><div class="modal-section-label">Data Source</div><div style="background:var(--cream);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6;">'+d.dataSource+'</div></div>'
+    +'<div><div class="modal-section-label">Output</div><div style="background:var(--cream);border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6;">'+d.output+'</div></div>'
+    +'<div><div class="modal-section-label">Human-in-the-Loop</div><div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;padding:12px 14px;font-size:13px;line-height:1.6;color:#78350F;">'+d.hitl+'</div></div>'
+    +'</div></div>'
+    +'<div id="mtab-govdetail" class="modal-tab-content">'
+    +'<div class="modal-section-label">Governance Controls</div>'
+    +'<div style="background:var(--cream);border-radius:8px;padding:16px 18px;font-size:13px;line-height:1.7;">'+d.governance+'</div>'
+    +'<div class="modal-section-label" style="margin-top:20px;">Guardian Compliance Stack</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+    +'<div style="background:#EFF6FF;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#1E40AF;"><strong>Microsoft Purview</strong><br>DLP policies + sensitivity labels govern all Copilot data access</div>'
+    +'<div style="background:#EFF6FF;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#1E40AF;"><strong>Agent 365</strong><br>Centralized policy management and agent monitoring</div>'
+    +'<div style="background:#EFF6FF;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#1E40AF;"><strong>M365 Audit Log</strong><br>Full interaction history for compliance review</div>'
+    +'<div style="background:#EFF6FF;border-radius:8px;padding:12px 14px;font-size:12.5px;color:#1E40AF;"><strong>Copilot Analytics</strong><br>Adoption trends, prompt usage, escalation rates</div>'
+    +'</div></div>';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function switchMTab(id,el){
+  document.querySelectorAll('.modal-tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.modal-tab-content').forEach(function(c){c.classList.remove('active');});
+  el.classList.add('active');
+  document.getElementById('mtab-'+id).classList.add('active');
+}
+function closeModalOv(e){if(e.target===document.getElementById('modalOverlay'))document.getElementById('modalOverlay').classList.remove('open');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')document.getElementById('modalOverlay').classList.remove('open');});
+</script>
+</body>
+</html>
